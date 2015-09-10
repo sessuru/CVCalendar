@@ -39,8 +39,9 @@ class CVCalendarView: UIView {
     var animator: Animator!
     var contentController: ContentViewController!
     var calendarMode: CalendarMode!
-    
-    var (weekViewSize: CGSize?, dayViewSize: CGSize?)
+  
+    var weekViewSize: CGSize?
+    var dayViewSize: CGSize?
     
     private var validated = false
     
@@ -157,7 +158,7 @@ class CVCalendarView: UIView {
     }
 
     /// IB Initialization
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         hidden = true
     }
@@ -167,7 +168,7 @@ class CVCalendarView: UIView {
 
 extension CVCalendarView {
     func commitCalendarViewUpdate() {
-        if let delegate = delegate, let contentController = contentController {
+        if let _ = delegate, let contentController = contentController {
             let contentViewSize = contentController.bounds.size
             let selfSize = bounds.size
             

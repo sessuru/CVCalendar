@@ -90,7 +90,8 @@ extension CVCalendarMonthView {
         self.frame = frame
         
         safeExecuteBlock({
-            for (index, weekView) in enumerate(self.weekViews) {
+//            for (index, weekView) in enumerate(self.weekViews) {
+            for (index, weekView) in self.weekViews.enumerate() {
                 if let size = self.calendarView.weekViewSize {
                     weekView.frame = CGRectMake(0, size.height * CGFloat(index), size.width, size.height)
                     weekView.reloadDayViews()

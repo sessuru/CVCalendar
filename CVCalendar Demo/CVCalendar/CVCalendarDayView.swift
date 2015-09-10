@@ -108,10 +108,10 @@ class CVCalendarDayView: UIView {
         let weekdaysIn = weekView.weekdaysIn
         
         if let weekdaysOut = weekView.weekdaysOut {
-            if hasDayAtWeekdayIndex(weekdayIndex, weekdaysOut) {
+            if hasDayAtWeekdayIndex(weekdayIndex, weekdaysDictionary: weekdaysOut) {
                 isOut = true
                 day = weekdaysOut[weekdayIndex]![0]
-            } else if hasDayAtWeekdayIndex(weekdayIndex, weekdaysIn!) {
+            } else if hasDayAtWeekdayIndex(weekdayIndex, weekdaysDictionary: weekdaysIn!) {
                 day = weekdaysIn![weekdayIndex]![0]
             }
         } else {
@@ -241,7 +241,7 @@ extension CVCalendarDayView {
     }
     
     func setupDotMarker() {
-        for (index, dotMarker) in enumerate(dotMarkers) {
+        for (index, dotMarker) in dotMarkers.enumerate() {
             dotMarkers[index]!.removeFromSuperview()
             dotMarkers[index] = nil
         }
@@ -249,7 +249,8 @@ extension CVCalendarDayView {
         if let delegate = calendarView.delegate {
             if let shouldShow = delegate.dotMarker?(shouldShowOnDayView: self) where shouldShow {
                 
-                let (width: CGFloat, height: CGFloat) = (13, 13)
+                let width: CGFloat = 13
+                let height: CGFloat = 13
                 let colors = isOut ? [.grayColor()] : delegate.dotMarker?(colorOnDayView: self)
                 var yOffset = bounds.height / 5
                 if let y = delegate.dotMarker?(moveOffsetOnDayView: self) {
@@ -262,7 +263,7 @@ extension CVCalendarDayView {
                     assert(false, "Only 3 dot markers allowed per day")
                 }
                 
-                for (index, color) in enumerate(colors!) {
+                for (index, color) in colors!.enumerate() {
                     var x: CGFloat = 0
                     switch(colors!.count) {
                     case 1:

@@ -102,7 +102,7 @@ extension ViewController: CVCalendarViewDelegate
 }
 
 
-extension ViewController: CVCalendarViewDelegate {
+extension ViewController {
     func presentationMode() -> CalendarMode {
         return .MonthView
     }
@@ -116,8 +116,7 @@ extension ViewController: CVCalendarViewDelegate {
     }
     
     func didSelectDayView(dayView: CVCalendarDayView) {
-        let date = dayView.date
-        println("\(calendarView.presentedDate.commonDescription) is selected!")
+        print("\(calendarView.presentedDate.commonDescription) is selected!")
     }
     
     func presentedDateUpdated(date: CVDate) {
