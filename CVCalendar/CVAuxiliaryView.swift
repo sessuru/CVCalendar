@@ -100,16 +100,13 @@ extension CVAuxiliaryView {
     }
     
     func rightFlagPath() -> UIBezierPath {
-        let appearance = dayView.calendarView.appearance
-        let offset = appearance.spaceBetweenDayViews!
-        
         let flag = UIBezierPath()
         flag.moveToPoint(CGPointMake(bounds.width / 2, bounds.height / 2 - radius))
         flag.addLineToPoint(CGPointMake(bounds.width, bounds.height / 2 - radius))
         flag.addLineToPoint(CGPointMake(bounds.width, bounds.height / 2 + radius ))
         flag.addLineToPoint(CGPointMake(bounds.width / 2, bounds.height / 2 + radius))
         
-        var path = CGPathCreateMutable()
+        let path = CGPathCreateMutable()
         CGPathAddPath(path, nil, circlePath().CGPath)
         CGPathAddPath(path, nil, flag.CGPath)
         
@@ -123,7 +120,7 @@ extension CVAuxiliaryView {
         flag.addLineToPoint(CGPointMake(0, bounds.height / 2 - radius))
         flag.addLineToPoint(CGPointMake(bounds.width / 2, bounds.height / 2 - radius))
         
-        var path = CGPathCreateMutable()
+        let path = CGPathCreateMutable()
         CGPathAddPath(path, nil, circlePath().CGPath)
         CGPathAddPath(path, nil, flag.CGPath)
         
@@ -131,13 +128,12 @@ extension CVAuxiliaryView {
     }
     
     func rectPath() -> UIBezierPath {
-        let midX = bounds.width / 2
         let midY = bounds.height / 2
         
         let appearance = dayView.calendarView.appearance
         let offset = appearance.spaceBetweenDayViews!
         
-        println("offset = \(offset)")
+        print("offset = \(offset)")
         
         let path = UIBezierPath(rect: CGRectMake(0 - offset, midY - radius, bounds.width + offset / 2, radius * 2))
         
