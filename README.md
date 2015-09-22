@@ -2,9 +2,21 @@
   <img src ="https://raw.githubusercontent.com/Mozharovsky/CVCalendar/master/Screenshots/CVCalendarIcon.png" />
 </p>
 
+Overview
+==========
+* [Global changes](https://github.com/Mozharovsky/CVCalendar#global-changes)
+* [Screenshots](https://github.com/Mozharovsky/CVCalendar#screenshots)
+* [GIF Demo](https://github.com/Mozharovsky/CVCalendar#gif-demo)
+* [Architecture](https://github.com/Mozharovsky/CVCalendar#architecture)
+* [Installation](https://github.com/Mozharovsky/CVCalendar#installation)
+* [Usage](https://github.com/Mozharovsky/CVCalendar#usage)
+* [Advanced API](https://github.com/Mozharovsky/CVCalendar#advanced-api)
+
 <h3>GLOBAL CHANGES</h3>
 
-The project is currently being under an active maintenance. We're going to bring a lot of new features as well as fix all bugs and optimize the library to make it incredibly efficient and fast ([see the full list](https://github.com/Mozharovsky/CVCalendar/issues/28)). API isn't changed so you don't pay anything for the update. The code can be found in [this branch](https://github.com/Mozharovsky/CVCalendar/tree/develop). It supports Swift 1.2. 
+The project is currently being under an active maintenance. We're going to bring a lot of new features as well as fix all bugs and optimize the library to make it incredibly efficient and fast ([see the full list](https://github.com/Mozharovsky/CVCalendar/issues/28)). API isn't changed so you don't pay anything for the update. 
+
+**CVCalendar** DOES require Swift 1.2.
 
 
 Screenshots
@@ -22,47 +34,16 @@ GIF Demo
 </p>
 
 
-Architecture
+[Architecture](https://github.com/Mozharovsky/CVCalendar/wiki/Architecture)
 ==========
 
-This calendar is designed according to all object oriented patterns. There are a few types of objects where a particular instance does its specific stuff. I've tried to separate Views from all the stuff it shouldn't do itself (e.g. calculations, date management etc). 
+Installation
+==========
+<h3> Cocoa Pods </h3>
 
-Types of Views:
-
-* CVCalendarView — Control properties main container, manages practically all the init stuff. 
-* CVCalendarContentView — Content container, defined as a ScrollView, manages scrolling & loading.
-* CVCalendarMonthView — Month container, takes responsibility for building WeekViews. 
-* CVCalendarWeekView — Week container, constructs DayViews. 
-* CVCalendarDayView — Fundamental unit, represents a simple day view. 
-* CVCalendarCirlceView — Auxiliary view for marking. 
-* CVCalendarMenuView — Menu container with weekdays' symbols. 
-
-First of all, we create an instance of CVCalendarView that creates CVCalendarContentView's one for containing all MonthViews. The CVCalendarContentView object creates a canvas for holding up to 3 CVCalendarMonthView instances. Only one MonthView can be displayed at the time so 2 other objects remain outside (on the left and right sides of the presented instance). When it's time for scrolling we figure out the direction and make a scroll either to the left or right MonthView, replacing it to the middle cell and then the empty cell is filled with a new MonthView. 
-
-Once an object of CVCalendarMonthView is created it initializes itself and creates CVCalendarWeekView instances depending on their count (which is calculated by CVCalendarManager). Each WeekView creates a set of CVCalendarDayViews. All the calculations (basically, it's about frames) are proceeded by specific (util) objects according to the user preferences (through delegates). 
-
-DayViews create CVCircleViews when they're highlighted as well as they remove circles on unhighlighting. CircleView is also used to represent a dot marker for marking some event. CVCalendarMenuView containts symbols of weekdays (it supports different languages).
-
-Types of Utils: 
-
-* CVCalendarRenderer — Makes all frames' calculations. 
-* CVCalendarManager — Analyzes the given date. 
-* CVCalendarViewAppearance — Contains and manages all appearance delegate's input. 
-* CVCalendarDayViewCoordinator — Handles touch events on DayViews. 
-* CVCalendarViewAnimator — Manages selection animations. 
- 
-Here everything is pretty obvious. CVCalendarViewAppearance represents an object that conforms to the corresponding protocol and as a result manages its stuff (either takes input from a user or gives a default value). CVCalendarViewAnimator also can be replaced with custom animations if it's necessary. 
-
-Types of Protocols: 
-
-* CVCalendarViewDelegate — Takes fundamental data.  
-* CVCalendarViewAppearanceDelegate — Defines methods for taking appearance stuff. 
-* CVCalendarViewAnimatorDelegate — The same for animation. 
-
-And there is one more type that represents a custom date:
-
-* CVDate
-
+```ruby
+pod 'CVCalendar', '~> 1.1.4'
+```
 
 Usage
 ==========
@@ -73,11 +54,13 @@ Using CVCalendar isn't difficult at all. There are two actual ways of implementi
 
 So let's get started.
 
+Warning! Since 1.1.1 version CVCalendar requires an implementation of two protocols **CVCalendarViewDelegate** and **CVCalendarMenuViewDelegate**, please implement both. Also note, they both have a method with the same signature which means you need to impement it only once. Take a look at the [Demo](https://github.com/Mozharovsky/CVCalendar/tree/master/CVCalendar) project for more info.
+
 <h3> Storyboard Setup </h3>
 
 <h4>Basic setup.</h4> 
 
-First, you have to add <b>CVCalendar</b> folder into your own project. (TODO: CocoaPods installation)
+First, you have to integrate **CVCalendar** with your project through **CocoaPods**. 
 
 Now you're about to add 2 UIViews to your Storyboard as it shown in the picture below.  
 ![alt tag](https://raw.githubusercontent.com/Mozharovsky/CVCalendar/master/Screenshots/Pic2.png)
@@ -194,96 +177,5 @@ And do not forget to commit updates on `viewDidLayoutSubviews` method.
 
 Here you go. 
 
-Advanced API
+[Advanced API](https://github.com/Mozharovsky/CVCalendar/wiki/Advanced-API)
 ==========
-
-For some additional funcionality there are a few handy techniques which can be useful for your app. 
-
-<h5>Starter Weekday</h5>
-
-You might want to use a specific first weekday in CVCalendar. And it's possible to set any weekday as the first one.
-
-> <b>NOTE</b>: Initilially, CVCalendar's figuring out your system calendar's first weekday and sets it as its own.
-
-Simply implement a method named `func firstWeekday() -> Weekday` form <b>CVCalendarViewDelegate</b>. Then set the appropriate enum value. Look at <b>Weekday</b> enum values. 
-
-```swift
-    func firstWeekday() -> Weekday {
-        return .Sunday
-    }
-```
-
-<h5>Toggling.</h5>
-
-It's possible to toggle from any month view to any month view by calling a special method in CVCalendarView and passing any date of this MonthView you wish to present in the calendar. For example, let's make a @IBAction method that is connected with <b>Today</b> button and toggles to the present month. 
-
-```swift 
-    @IBAction func todayMonthView() {
-        self.calendarView.toggleCurrentDayView()
-    }
-```
-
-As well you're able to toggle to any month. Let's create a method that changes MonthView with the given offset of current month.
-
-```swift
-    func toggleMonthViewWithMonthOffset(offset: Int) {
-        let calendar = NSCalendar.currentCalendar()
-        let calendarManager = CVCalendarManager.sharedManager
-        let components = calendarManager.componentsForDate(NSDate()) // from today
-        
-        components.month += offset
-        components.day = 1 // CVCalendar will select this day view
-        
-        let resultDate = calendar.dateFromComponents(components)!
-        
-        self.calendarView.toggleMonthViewWithDate(resultDate)
-    }
-```
-
-<h5>Switching.</h5>
-
-Also you can simply switch between next and previous MonthViews relatively to the presented one. Let's say the presented MonthView is <b>January</b> then the previous one is <b>December</b> and the next one is <b>February</b> if you have special buttons ("<" - to the previous, ">" - to the next) the following methods will help you easily switch between MonthViews. 
-
-For loading next MonthView. 
-```swift
-        self.calendarView.loadNextMonthView()
-```
-
-For loading previous MonthView.
-```swift
-        self.calendarView.loadPreviousMonthView()
-```
-
-<h5>Days out hiding.</h5>
-
-It's possible not to show days out of the presented month. First, CVCalendar provides a special method for (un)hiding days out with animation. Second, once you've made days out hidden ones it doesn't mean CVCalendar won't show them anymore. You also have to pass an appropriate value in `shouldShowWeekdaysOut:` method to notify CVCalendar you don't want to show days out. 
-
-For animatible hiding. 
-
-```swift 
-            self.calendarView!.changeDaysOutShowingState(true) // just hide days out in loaded Month Views
-            self.shouldShowDaysOut = false // passing value for 'shouldShowWeekdaysOut:'
-```
-
-Unhiding. 
-
-```swift
-            self.calendarView!.changeDaysOutShowingState(false) // just unhide days out in loaded Month Views
-            self.shouldShowDaysOut = true // passing value for 'shouldShowWeekdaysOut:'
-```
-
-<h5>Changing the presentation mode.</h5>
-
-If you want to animate the calendar from one presentation mode to another then simply call `func changeMode(mode: CalendarMode)` method from CVCalendarView instance passing an appropriate value. 
-
-```swift
-    /// Switch to WeekView mode.
-    @IBAction func toWeekView(sender: AnyObject) {
-        calendarView.changeMode(.WeekView)
-    }
-    
-    /// Switch to MonthView mode.
-    @IBAction func toMonthView(sender: AnyObject) {
-        calendarView.changeMode(.MonthView)
-    }
-```

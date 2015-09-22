@@ -13,7 +13,7 @@ import UIKit
   *  Instead use native Swift Set<T> collection.
 */
 
-struct CVSet<T: AnyObject>: NilLiteralConvertible {
+public struct CVSet<T: AnyObject>: NilLiteralConvertible {
     // MARK: - Private properties
     private var storage = [T]()
     
@@ -27,7 +27,7 @@ struct CVSet<T: AnyObject>: NilLiteralConvertible {
     }
     
     // MARK: - Initialization
-    init(nilLiteral: ()) { }
+    public init(nilLiteral: ()) { }
     init() { }
     
     // MARK: - Subscript
@@ -44,7 +44,7 @@ struct CVSet<T: AnyObject>: NilLiteralConvertible {
 
 // MARK: - Mutating methods
 
-extension CVSet {
+public extension CVSet {
     mutating func addObject(object: T) {
         if indexObject(object) == nil {
             storage.append(object)
@@ -66,7 +66,7 @@ extension CVSet {
 
 private extension CVSet {
     func indexObject(object: T) -> Int? {
-        for (index, storageObj) in storage.enumerate() {
+        for (index, storageObj) in enumerate(storage) {
             if storageObj === object {
                 return index
             }
@@ -78,12 +78,12 @@ private extension CVSet {
 
 
 // MARK: - SequenceType
-extension CVSet: SequenceType {
-    func generate() -> AnyGenerator<T> {
+ extension CVSet: SequenceType {
+    public func generate() -> GeneratorOf<T> {
         var power = 0
-        let nextClosure : () -> T? = {
+        var nextClosure : () -> T? = {
             (power < self.count) ? self.storage[power++] : nil
         }
-        return AnyGenerator<T>(nextClosure)
+        return GeneratorOf<T>(nextClosure)
     }
 }
