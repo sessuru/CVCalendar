@@ -25,7 +25,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
         initialLoad(presentedDate)
     }
     
-    public required init(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -37,7 +37,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
         insertMonthView(getFollowingMonth(date), withIdentifier: Following)
         
         presentedMonthView.mapDayViews { dayView in
-            if self.matchedDays(dayView.date, Date(date: date)) {
+            if self.calendarView.shouldAutoSelectDayOnMonthChange && self.matchedDays(dayView.date, Date(date: date)) {
                 self.calendarView.coordinator.flush()
                 self.calendarView.touchController.receiveTouchOnDayView(dayView)
                 dayView.circleView?.removeFromSuperview()
@@ -89,6 +89,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
                 replaceMonthView(following, withIdentifier: Presented, animatable: true)
                 
                 insertMonthView(getFollowingMonth(following.date), withIdentifier: Following)
+                self.calendarView.delegate?.didShowNextMonthView?(following.date)
             }
             
         }
@@ -104,6 +105,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
                 replaceMonthView(presented, withIdentifier: Following, animatable: false)
                 
                 insertMonthView(getPreviousMonth(previous.date), withIdentifier: Previous)
+                self.calendarView.delegate?.didShowPreviousMonthView?(previous.date)
             }
         }
     }
@@ -129,7 +131,7 @@ public final class CVCalendarMonthContentViewController: CVCalendarContentViewCo
     }
     
     public override func performedDayViewSelection(dayView: DayView) {
-        if dayView.isOut {
+        if dayView.isOut && calendarView.shouldScrollOnOutDayViewSelection {
             if dayView.date.day > 20 {
                 let presentedDate = dayView.monthView.date
                 calendarView.presentedDate = Date(date: self.dateBeforeDate(presentedDate))
@@ -336,7 +338,7 @@ extension CVCalendarMonthContentViewController {
             self.presentedMonthView = presentedMonthView
             calendarView.presentedDate = Date(date: presentedMonthView.date)
             
-            if let selected = coordinator.selectedDayView, let selectedMonthView = selected.monthView where !matchedMonths(Date(date: selectedMonthView.date), Date(date: presentedMonthView.date)) {
+            if let selected = coordinator.selectedDayView, let selectedMonthView = selected.monthView where !matchedMonths(Date(date: selectedMonthView.date), Date(date: presentedMonthView.date)) && calendarView.shouldAutoSelectDayOnMonthChange {
                 let current = Date(date: NSDate())
                 let presented = Date(date: presentedMonthView.date)
                 
