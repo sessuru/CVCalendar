@@ -9,6 +9,16 @@
 import UIKit
 
 class ViewController: UIViewController {
+    struct Color {
+        static let selectedText = UIColor.white
+        static let text = UIColor.black
+        static let textDisabled = UIColor.gray
+        static let selectionBackground = UIColor(red: 0.2, green: 0.2, blue: 1.0, alpha: 1.0)
+        static let sundayText = UIColor(red: 1.0, green: 0.2, blue: 0.2, alpha: 1.0)
+        static let sundayTextDisabled = UIColor(red: 1.0, green: 0.6, blue: 0.6, alpha: 1.0)
+        static let sundaySelectionBackground = sundayText
+    }
+    
     // MARK: - Properties
     @IBOutlet weak var calendarView: CVCalendarView!
     @IBOutlet weak var menuView: CVCalendarMenuView!
@@ -24,8 +34,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        monthLabel.text = CVDate(date: NSDate()).globalDescription
+        
+        monthLabel.text = CVDate(date: Date()).globalDescription
     }
 
     @IBAction func removeCircleAndDot(sender: AnyObject) {
@@ -53,15 +63,19 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     
     /// Required method to implement!
     func presentationMode() -> CalendarMode {
-        return .MonthView
+        return .monthView
     }
     
     /// Required method to implement!
     func firstWeekday() -> Weekday {
-        return .Sunday
+        return .sunday
     }
     
     // MARK: Optional methods
+    
+    func dayOfWeekTextColor(by weekday: Weekday) -> UIColor {
+        return weekday == .sunday ? UIColor(red: 1.0, green: 0.5, blue: 0.5, alpha: 1.0) : UIColor.white
+    }
     
     func shouldShowWeekdaysOut() -> Bool {
         return shouldShowDaysOut
@@ -71,41 +85,45 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
         return true // Default value is true
     }
     
-    func didSelectDayView(dayView: CVCalendarDayView, animationDidFinish: Bool) {
+    private func shouldSelectDayView(dayView: DayView) -> Bool {
+        return arc4random_uniform(3) == 0 ? true : false
+    }
+    
+    func didSelectDayView(_ dayView: CVCalendarDayView, animationDidFinish: Bool) {
         print("\(dayView.date.commonDescription) is selected!")
         selectedDay = dayView
     }
     
-    func presentedDateUpdated(date: CVDate) {
+    func presentedDateUpdated(_ date: CVDate) {
         if monthLabel.text != date.globalDescription && self.animationFinished {
             let updatedMonthLabel = UILabel()
             updatedMonthLabel.textColor = monthLabel.textColor
             updatedMonthLabel.font = monthLabel.font
-            updatedMonthLabel.textAlignment = .Center
+            updatedMonthLabel.textAlignment = .center
             updatedMonthLabel.text = date.globalDescription
             updatedMonthLabel.sizeToFit()
             updatedMonthLabel.alpha = 0
             updatedMonthLabel.center = self.monthLabel.center
             
             let offset = CGFloat(48)
-            updatedMonthLabel.transform = CGAffineTransformMakeTranslation(0, offset)
-            updatedMonthLabel.transform = CGAffineTransformMakeScale(1, 0.1)
+            updatedMonthLabel.transform = CGAffineTransform(translationX: 0, y: offset)
+            updatedMonthLabel.transform = CGAffineTransform(scaleX: 1, y: 0.1)
             
-            UIView.animateWithDuration(0.35, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: {
+            UIView.animate(withDuration: 0.35, delay: 0, options: UIViewAnimationOptions.curveEaseIn, animations: {
                 self.animationFinished = false
-                self.monthLabel.transform = CGAffineTransformMakeTranslation(0, -offset)
-                self.monthLabel.transform = CGAffineTransformMakeScale(1, 0.1)
+                self.monthLabel.transform = CGAffineTransform(translationX: 0, y: -offset)
+                self.monthLabel.transform = CGAffineTransform(scaleX: 1, y: 0.1)
                 self.monthLabel.alpha = 0
                 
                 updatedMonthLabel.alpha = 1
-                updatedMonthLabel.transform = CGAffineTransformIdentity
+                updatedMonthLabel.transform = CGAffineTransform.identity
                 
                 }) { _ in
                     
                     self.animationFinished = true
                     self.monthLabel.frame = updatedMonthLabel.frame
                     self.monthLabel.text = updatedMonthLabel.text
-                    self.monthLabel.transform = CGAffineTransformIdentity
+                    self.monthLabel.transform = CGAffineTransform.identity
                     self.monthLabel.alpha = 1
                     updatedMonthLabel.removeFromSuperview()
             }
@@ -157,11 +175,11 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
 
     
     func weekdaySymbolType() -> WeekdaySymbolType {
-        return .Short
+        return .short
     }
     
     func selectionViewPath() -> ((CGRect) -> (UIBezierPath)) {
-        return { UIBezierPath(rect: CGRectMake(0, 0, $0.width, $0.height)) }
+        return { UIBezierPath(rect: CGRect(x: 0, y: 0, width: $0.width, height: $0.height)) }
     }
     
     func shouldShowCustomSingleSelection() -> Bool {
@@ -169,7 +187,7 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     }
 
     func preliminaryView(viewOnDayView dayView: DayView) -> UIView {
-        let circleView = CVAuxiliaryView(dayView: dayView, rect: dayView.bounds, shape: CVShape.Circle)
+        let circleView = CVAuxiliaryView(dayView: dayView, rect: dayView.bounds, shape: CVShape.circle)
         circleView.fillColor = .colorFromCode(0xCCCCCC)
         return circleView
     }
@@ -189,30 +207,30 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
         let ringVerticalOffset: CGFloat = 1.0
         var ringLayer: CAShapeLayer!
         let ringLineWidth: CGFloat = 4.0
-        let ringLineColour: UIColor = .blueColor()
+        let ringLineColour: UIColor = .blue
         
         let newView = UIView(frame: dayView.bounds)
         
         let diameter: CGFloat = (newView.bounds.width) - ringSpacing
         let radius: CGFloat = diameter / 2.0
         
-        let rect = CGRectMake(newView.frame.midX-radius, newView.frame.midY-radius-ringVerticalOffset, diameter, diameter)
+        let rect = CGRect(x: newView.frame.midX-radius, y: newView.frame.midY-radius-ringVerticalOffset, width: diameter, height: diameter)
         
         ringLayer = CAShapeLayer()
         newView.layer.addSublayer(ringLayer)
         
         ringLayer.fillColor = nil
         ringLayer.lineWidth = ringLineWidth
-        ringLayer.strokeColor = ringLineColour.CGColor
+        ringLayer.strokeColor = ringLineColour.cgColor
         
         let ringLineWidthInset: CGFloat = CGFloat(ringLineWidth/2.0) + ringInsetWidth
-        let ringRect: CGRect = CGRectInset(rect, ringLineWidthInset, ringLineWidthInset)
-        let centrePoint: CGPoint = CGPointMake(ringRect.midX, ringRect.midY)
+        let ringRect: CGRect = rect.insetBy(dx: ringLineWidthInset, dy: ringLineWidthInset)
+        let centrePoint: CGPoint = CGPoint(x: ringRect.midX, y: ringRect.midY)
         let startAngle: CGFloat = CGFloat(-π/2.0)
         let endAngle: CGFloat = CGFloat(π * 2.0) + startAngle
         let ringPath: UIBezierPath = UIBezierPath(arcCenter: centrePoint, radius: ringRect.width/2.0, startAngle: startAngle, endAngle: endAngle, clockwise: true)
         
-        ringLayer.path = ringPath.CGPath
+        ringLayer.path = ringPath.cgPath
         ringLayer.frame = newView.layer.bounds
         
         return newView
@@ -224,6 +242,14 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
         }
         
         return false
+    }
+    
+    func dayOfWeekTextColor() -> UIColor {
+        return UIColor.white
+    }
+    
+    func dayOfWeekBackGroundColor() -> UIColor {
+        return UIColor.orange
     }
 }
 
@@ -238,13 +264,33 @@ extension ViewController: CVCalendarViewAppearanceDelegate {
     func spaceBetweenDayViews() -> CGFloat {
         return 2
     }
+    
+    func dayLabelFont(by weekDay: Weekday, status: CVStatus, present: CVPresent) -> UIFont { return UIFont.systemFont(ofSize: 14) }
+    
+    func dayLabelColor(by weekDay: Weekday, status: CVStatus, present: CVPresent) -> UIColor? {
+        switch (weekDay, status, present) {
+        case (_, .selected, _), (_, .highlighted, _): return Color.selectedText
+        case (.sunday, .in, _): return Color.sundayText
+        case (.sunday, _, _): return Color.sundayTextDisabled
+        case (_, .in, _): return Color.text
+        default: return Color.textDisabled
+        }
+    }
+    
+    func dayLabelBackgroundColor(by weekDay: Weekday, status: CVStatus, present: CVPresent) -> UIColor? {
+        switch (weekDay, status, present) {
+        case (.sunday, .selected, _), (.sunday, .highlighted, _): return Color.sundaySelectionBackground
+        case (_, .selected, _), (_, .highlighted, _): return Color.selectionBackground
+        default: return nil
+        }
+    }
 }
 
 // MARK: - IB Actions
 
 extension ViewController {
     @IBAction func switchChanged(sender: UISwitch) {
-        if sender.on {
+        if sender.isOn {
             calendarView.changeDaysOutShowingState(false)
             shouldShowDaysOut = true
         } else {
@@ -259,12 +305,12 @@ extension ViewController {
     
     /// Switch to WeekView mode.
     @IBAction func toWeekView(sender: AnyObject) {
-        calendarView.changeMode(.WeekView)
+        calendarView.changeMode(.weekView)
     }
     
     /// Switch to MonthView mode.
     @IBAction func toMonthView(sender: AnyObject) {
-        calendarView.changeMode(.MonthView)
+        calendarView.changeMode(.monthView)
     }
     
     @IBAction func loadPrevious(sender: AnyObject) {
@@ -281,13 +327,13 @@ extension ViewController {
 
 extension ViewController {
     func toggleMonthViewWithMonthOffset(offset: Int) {
-        let calendar = NSCalendar.currentCalendar()
+        let calendar = NSCalendar.current
 //        let calendarManager = calendarView.manager
-        let components = Manager.componentsForDate(NSDate()) // from today
+        var components = Manager.componentsForDate(Foundation.Date()) // from today
         
-        components.month += offset
+        components.month! += offset
         
-        let resultDate = calendar.dateFromComponents(components)!
+        let resultDate = calendar.date(from: components)!
         
         self.calendarView.toggleViewWithDate(resultDate)
     }
@@ -296,7 +342,7 @@ extension ViewController {
     {
 //        let calendar = NSCalendar.currentCalendar()
 //        let calendarManager = calendarView.manager
-        let components = Manager.componentsForDate(date) // from today
+        let components = Manager.componentsForDate(date as Date) // from today
         
         print("Showing Month: \(components.month)")
     }
@@ -306,7 +352,7 @@ extension ViewController {
     {
 //        let calendar = NSCalendar.currentCalendar()
 //        let calendarManager = calendarView.manager
-        let components = Manager.componentsForDate(date) // from today
+        let components = Manager.componentsForDate(date as Date) // from today
         
         print("Showing Month: \(components.month)")
     }

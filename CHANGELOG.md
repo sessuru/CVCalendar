@@ -1,5 +1,109 @@
 # Change Log
 
+## [1.4.0](https://github.com/Mozharovsky/CVCalendar/tree/1.4.0) (2016-09-14)
+[Full Changelog](https://github.com/Mozharovsky/CVCalendar/compare/1.3.1...1.4.0)
+
+**Closed issues:**
+
+- Change the month and the app goes in crash!!! [\#337](https://github.com/Mozharovsky/CVCalendar/issues/337)
+
+## [1.3.1](https://github.com/Mozharovsky/CVCalendar/tree/1.3.1) (2016-09-14)
+[Full Changelog](https://github.com/Mozharovsky/CVCalendar/compare/1.3.0...1.3.1)
+
+**Closed issues:**
+
+- How to change Year? [\#345](https://github.com/Mozharovsky/CVCalendar/issues/345)
+- Highlight of the today is wrong [\#343](https://github.com/Mozharovsky/CVCalendar/issues/343)
+- Calendar without dots and disabled days. [\#342](https://github.com/Mozharovsky/CVCalendar/issues/342)
+- Programmatically Reloading the Calendar [\#340](https://github.com/Mozharovsky/CVCalendar/issues/340)
+- Problem with the last update!!! [\#336](https://github.com/Mozharovsky/CVCalendar/issues/336)
+- dotMarker Show wrong date match , How to fix? [\#335](https://github.com/Mozharovsky/CVCalendar/issues/335)
+- Text Label Color for Unselected Dates [\#334](https://github.com/Mozharovsky/CVCalendar/issues/334)
+- Nib Files and @IBDesignable [\#329](https://github.com/Mozharovsky/CVCalendar/issues/329)
+- How to add events to month view & reload the monthview ? [\#328](https://github.com/Mozharovsky/CVCalendar/issues/328)
+- how can we navigate  different date now it is loading currentdate.  [\#326](https://github.com/Mozharovsky/CVCalendar/issues/326)
+- New version on Cocoapods [\#323](https://github.com/Mozharovsky/CVCalendar/issues/323)
+- How can i change Scroll From Horizontal to Vertical when change month? [\#319](https://github.com/Mozharovsky/CVCalendar/issues/319)
+- How to init a date in one specific month when I calendar show up? [\#318](https://github.com/Mozharovsky/CVCalendar/issues/318)
+- display current and following months only in the calendar view [\#312](https://github.com/Mozharovsky/CVCalendar/issues/312)
+- Disable or Change Past Days text color or selection background color [\#311](https://github.com/Mozharovsky/CVCalendar/issues/311)
+- How to avoid selected day default circle being overlapped by supplementary view? [\#302](https://github.com/Mozharovsky/CVCalendar/issues/302)
+- Cant import CVCalendar [\#296](https://github.com/Mozharovsky/CVCalendar/issues/296)
+- I want this feature: 1. User can select multiple dates 2. On long tapping a date it will ask for selecting the date range to get selected. [\#295](https://github.com/Mozharovsky/CVCalendar/issues/295)
+- I want to select multiple dates on an urgent basis. Please help me. [\#294](https://github.com/Mozharovsky/CVCalendar/issues/294)
+- issue while updating on swift 2.2 [\#293](https://github.com/Mozharovsky/CVCalendar/issues/293)
+- Turn off swipe functionality? [\#277](https://github.com/Mozharovsky/CVCalendar/issues/277)
+- Slow updating when change mode [\#225](https://github.com/Mozharovsky/CVCalendar/issues/225)
+- jalali calendar [\#217](https://github.com/Mozharovsky/CVCalendar/issues/217)
+
+**Merged pull requests:**
+
+- Issue \#337, "Change the month and the app goes in crash!" [\#346](https://github.com/Mozharovsky/CVCalendar/pull/346) ([nikolay-dementiev](https://github.com/nikolay-dementiev))
+- Swift 3 [\#339](https://github.com/Mozharovsky/CVCalendar/pull/339) ([Antoine4011](https://github.com/Antoine4011))
+- Customize duration of date selection animation [\#338](https://github.com/Mozharovsky/CVCalendar/pull/338) ([ozgur](https://github.com/ozgur))
+
+## [1.3.0](https://github.com/Mozharovsky/CVCalendar/tree/1.3.0) (2016-09-02)
+[Full Changelog](https://github.com/Mozharovsky/CVCalendar/compare/1.2.9...1.3.0)
+
+**Closed issues:**
+
+- Menu view sends wrong weekdays to its delegate methods [\#333](https://github.com/Mozharovsky/CVCalendar/issues/333)
+- Dotmarker are appearing on the next date from the date I applied. [\#327](https://github.com/Mozharovsky/CVCalendar/issues/327)
+- When month is changed thru swiping in either direction, I want to handle certain action. [\#325](https://github.com/Mozharovsky/CVCalendar/issues/325)
+- Make selected Dayview's highlighted color shape square instead of rounded [\#321](https://github.com/Mozharovsky/CVCalendar/issues/321)
+- Reload calendar data [\#320](https://github.com/Mozharovsky/CVCalendar/issues/320)
+- Long press date for popup modal [\#316](https://github.com/Mozharovsky/CVCalendar/issues/316)
+- I need to implement calendar view like Activity app with activity ring under every day.  [\#315](https://github.com/Mozharovsky/CVCalendar/issues/315)
+- Past days greyed out? [\#309](https://github.com/Mozharovsky/CVCalendar/issues/309)
+- How to mark Dots on desire date? [\#306](https://github.com/Mozharovsky/CVCalendar/issues/306)
+- How can i grey out custom dates in a fast and efficient way, it would be nice to have this feature, i added a delegate to check the dayView for days and grey out those days, I also would like to have no user interaction on the grey out dates [\#304](https://github.com/Mozharovsky/CVCalendar/issues/304)
+- Undefined symbols for architecture arm64: [\#303](https://github.com/Mozharovsky/CVCalendar/issues/303)
+- I tried to install using cocoapod like in the documentation, but it gets stuck and just stuck. Is there any new way to add this library??  [\#301](https://github.com/Mozharovsky/CVCalendar/issues/301)
+- Blue circle too great in landscape mode!!! [\#300](https://github.com/Mozharovsky/CVCalendar/issues/300)
+- Is it possible to customise CVCalendarView? [\#299](https://github.com/Mozharovsky/CVCalendar/issues/299)
+- Initilaze date [\#297](https://github.com/Mozharovsky/CVCalendar/issues/297)
+- Content Alignment? [\#292](https://github.com/Mozharovsky/CVCalendar/issues/292)
+- DotMarker Color [\#291](https://github.com/Mozharovsky/CVCalendar/issues/291)
+- How to set current day label unselected color? [\#290](https://github.com/Mozharovsky/CVCalendar/issues/290)
+- Possibility to set the selected date [\#283](https://github.com/Mozharovsky/CVCalendar/issues/283)
+- CVCalendarView only appearing on iPhone Plus [\#281](https://github.com/Mozharovsky/CVCalendar/issues/281)
+- How about 'day view' and 'week view' ? [\#276](https://github.com/Mozharovsky/CVCalendar/issues/276)
+- why CVCalendarContentViewController is a subclass of UIViewController? [\#275](https://github.com/Mozharovsky/CVCalendar/issues/275)
+- how can we remove dots and add lines on that day... instead of dots want to add Lines..  [\#271](https://github.com/Mozharovsky/CVCalendar/issues/271)
+- Is their any way to view default look as weekview.. Not the monthview [\#265](https://github.com/Mozharovsky/CVCalendar/issues/265)
+- Vertical month scrolling   [\#260](https://github.com/Mozharovsky/CVCalendar/issues/260)
+- CVCalendarView disappears [\#258](https://github.com/Mozharovsky/CVCalendar/issues/258)
+- New Install can not find CVCalendarView [\#257](https://github.com/Mozharovsky/CVCalendar/issues/257)
+- Is their any way to view default look  as weekview.. Not the monthview [\#256](https://github.com/Mozharovsky/CVCalendar/issues/256)
+- how to hide or disable days before today  [\#255](https://github.com/Mozharovsky/CVCalendar/issues/255)
+- memory leakage. [\#252](https://github.com/Mozharovsky/CVCalendar/issues/252)
+- Need reload function [\#249](https://github.com/Mozharovsky/CVCalendar/issues/249)
+- range selection [\#248](https://github.com/Mozharovsky/CVCalendar/issues/248)
+- Installation problem [\#245](https://github.com/Mozharovsky/CVCalendar/issues/245)
+- Change colour of menu labels [\#242](https://github.com/Mozharovsky/CVCalendar/issues/242)
+- Nepali Calendar [\#239](https://github.com/Mozharovsky/CVCalendar/issues/239)
+- unable to get the right NSDate back [\#236](https://github.com/Mozharovsky/CVCalendar/issues/236)
+- Changelog has not been updated in 9 months [\#235](https://github.com/Mozharovsky/CVCalendar/issues/235)
+- How do i reload the calendar view? [\#234](https://github.com/Mozharovsky/CVCalendar/issues/234)
+- Add different color of event [\#224](https://github.com/Mozharovsky/CVCalendar/issues/224)
+- Carthage [\#204](https://github.com/Mozharovsky/CVCalendar/issues/204)
+- Warnings in Library [\#169](https://github.com/Mozharovsky/CVCalendar/issues/169)
+- sir help me please [\#157](https://github.com/Mozharovsky/CVCalendar/issues/157)
+
+**Merged pull requests:**
+
+- Fixed populating incorrect weekdays [\#332](https://github.com/Mozharovsky/CVCalendar/pull/332) ([ozgur](https://github.com/ozgur))
+- Updating Top Marker Color [\#331](https://github.com/Mozharovsky/CVCalendar/pull/331) ([ozgur](https://github.com/ozgur))
+- Preventing selections. and the DayView can be configured by weekdays [\#322](https://github.com/Mozharovsky/CVCalendar/pull/322) ([wanbok](https://github.com/wanbok))
+- Merge Request [\#310](https://github.com/Mozharovsky/CVCalendar/pull/310) ([jobinsjohn](https://github.com/jobinsjohn))
+- Fixed colouring for more than one dot marker after unhighlighting day [\#307](https://github.com/Mozharovsky/CVCalendar/pull/307) ([GentleTroll](https://github.com/GentleTroll))
+- Adding BackGround colour for day of weeks in MenuView [\#305](https://github.com/Mozharovsky/CVCalendar/pull/305) ([shallad](https://github.com/shallad))
+- Minor Readme.md edit [\#284](https://github.com/Mozharovsky/CVCalendar/pull/284) ([oscarmorrison](https://github.com/oscarmorrison))
+- Style changes [\#263](https://github.com/Mozharovsky/CVCalendar/pull/263) ([dbmrq](https://github.com/dbmrq))
+- Cleared all warnings and merged CVCalendar and Demo directories [\#261](https://github.com/Mozharovsky/CVCalendar/pull/261) ([dbmrq](https://github.com/dbmrq))
+- update for swift2.2 [\#259](https://github.com/Mozharovsky/CVCalendar/pull/259) ([sairamkotha](https://github.com/sairamkotha))
+- Update CHANGELOG.md [\#246](https://github.com/Mozharovsky/CVCalendar/pull/246) ([bre7](https://github.com/bre7))
+
 ## [1.2.9](https://github.com/Mozharovsky/CVCalendar/tree/1.2.9) (2016-02-16)
 [Full Changelog](https://github.com/Mozharovsky/CVCalendar/compare/1.2.8...1.2.9)
 
@@ -30,7 +134,7 @@
 
 **Merged pull requests:**
 
-- Fix codestyle [\#231](https://github.com/Mozharovsky/CVCalendar/pull/231) ([DanShevlyuk](https://github.com/DanShevlyuk))
+- Fix codestyle [\#231](https://github.com/Mozharovsky/CVCalendar/pull/231) ([danshevluk](https://github.com/danshevluk))
 - Correct the spelling of CocoaPods in README [\#227](https://github.com/Mozharovsky/CVCalendar/pull/227) ([ReadmeCritic](https://github.com/ReadmeCritic))
 - Added weak references to delegates to prevent memory leakage. [\#219](https://github.com/Mozharovsky/CVCalendar/pull/219) ([kadarandras](https://github.com/kadarandras))
 - Carthage compatible project [\#214](https://github.com/Mozharovsky/CVCalendar/pull/214) ([sprint84](https://github.com/sprint84))
@@ -45,7 +149,6 @@
 
 **Closed issues:**
 
-- Snapping back to current date [\#185](https://github.com/Mozharovsky/CVCalendar/issues/185)
 - Remove line between each week for month view? [\#184](https://github.com/Mozharovsky/CVCalendar/issues/184)
 - reload dots [\#177](https://github.com/Mozharovsky/CVCalendar/issues/177)
 - Reloading calendar? [\#175](https://github.com/Mozharovsky/CVCalendar/issues/175)
