@@ -25,28 +25,51 @@ class ViewController: UIViewController {
     @IBOutlet weak var monthLabel: UILabel!
     @IBOutlet weak var daysOutSwitch: UISwitch!
     
+    fileprivate var randomNumberOfDotMarkersForDay = [Int]()
+    
     var shouldShowDaysOut = true
     var animationFinished = true
     
     var selectedDay:DayView!
+    
+    var currentCalendar: Calendar?
+    
+    override func awakeFromNib() {
+        let timeZoneBias = 480 // (UTC+08:00)
+        currentCalendar = Calendar.init(identifier: .gregorian)
+        if let timeZone = TimeZone.init(secondsFromGMT: -timeZoneBias * 60) {
+            currentCalendar?.timeZone = timeZone
+        }
+    }
     
     // MARK: - Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        monthLabel.text = CVDate(date: Date()).globalDescription
+        if let currentCalendar = currentCalendar {
+            monthLabel.text = CVDate(date: Date(), calendar: currentCalendar).globalDescription
+        }
+        
+        randomizeDotMarkers()
     }
-
+    
     @IBAction func removeCircleAndDot(sender: AnyObject) {
         if let dayView = selectedDay {
             calendarView.contentController.removeCircleLabel(dayView)
-            calendarView.contentController.removeDotViews(dayView)
+            
+            if dayView.date.day < randomNumberOfDotMarkersForDay.count {
+                randomNumberOfDotMarkersForDay[dayView.date.day] = 0
+            }
+            
+            calendarView.contentController.refreshPresentedMonth()
         }
     }
     
     @IBAction func refreshMonth(sender: AnyObject) {
         calendarView.contentController.refreshPresentedMonth()
+        
+        randomizeDotMarkers()
     }
     
     override func viewDidLayoutSubviews() {
@@ -54,6 +77,13 @@ class ViewController: UIViewController {
         
         calendarView.commitCalendarViewUpdate()
         menuView.commitMenuViewUpdate()
+    }
+    
+    private func randomizeDotMarkers() {
+        randomNumberOfDotMarkersForDay = [Int]()
+        for _ in 0...31 {
+            randomNumberOfDotMarkersForDay.append(Int(arc4random_uniform(3) + 1))
+        }
     }
 }
 
@@ -73,8 +103,12 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     
     // MARK: Optional methods
     
+    func calendar() -> Calendar? {
+        return currentCalendar
+    }
+    
     func dayOfWeekTextColor(by weekday: Weekday) -> UIColor {
-        return weekday == .sunday ? UIColor(red: 1.0, green: 0.5, blue: 0.5, alpha: 1.0) : UIColor.white
+        return weekday == .sunday ? UIColor(red: 1.0, green: 0, blue: 0, alpha: 1.0) : UIColor.white
     }
     
     func shouldShowWeekdaysOut() -> Bool {
@@ -89,9 +123,20 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
         return arc4random_uniform(3) == 0 ? true : false
     }
     
+    func shouldAutoSelectDayOnMonthChange() -> Bool {
+        return false
+    }
+    
     func didSelectDayView(_ dayView: CVCalendarDayView, animationDidFinish: Bool) {
-        print("\(dayView.date.commonDescription) is selected!")
         selectedDay = dayView
+    }
+    
+    func shouldSelectRange() -> Bool {
+        return true
+    }
+    
+    func didSelectRange(from startDayView: DayView, to endDayView: DayView) {
+        print("RANGE SELECTED: \(startDayView.date.commonDescription) to \(endDayView.date.commonDescription)")
     }
     
     func presentedDateUpdated(_ date: CVDate) {
@@ -118,14 +163,14 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
                 updatedMonthLabel.alpha = 1
                 updatedMonthLabel.transform = CGAffineTransform.identity
                 
-                }) { _ in
-                    
-                    self.animationFinished = true
-                    self.monthLabel.frame = updatedMonthLabel.frame
-                    self.monthLabel.text = updatedMonthLabel.text
-                    self.monthLabel.transform = CGAffineTransform.identity
-                    self.monthLabel.alpha = 1
-                    updatedMonthLabel.removeFromSuperview()
+            }) { _ in
+                
+                self.animationFinished = true
+                self.monthLabel.frame = updatedMonthLabel.frame
+                self.monthLabel.text = updatedMonthLabel.text
+                self.monthLabel.transform = CGAffineTransform.identity
+                self.monthLabel.alpha = 1
+                updatedMonthLabel.removeFromSuperview()
             }
             
             self.view.insertSubview(updatedMonthLabel, aboveSubview: self.monthLabel)
@@ -136,43 +181,6 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
         return true
     }
     
-    func dotMarker(shouldShowOnDayView dayView: CVCalendarDayView) -> Bool {
-        let day = dayView.date.day
-        let randomDay = Int(arc4random_uniform(31))
-        if day == randomDay {
-            return true
-        }
-        
-        return false
-    }
-    
-    func dotMarker(colorOnDayView dayView: CVCalendarDayView) -> [UIColor] {
-        
-        let red = CGFloat(arc4random_uniform(600) / 255)
-        let green = CGFloat(arc4random_uniform(600) / 255)
-        let blue = CGFloat(arc4random_uniform(600) / 255)
-        
-        let color = UIColor(red: red, green: green, blue: blue, alpha: 1)
-
-        let numberOfDots = Int(arc4random_uniform(3) + 1)
-        switch(numberOfDots) {
-        case 2:
-            return [color, color]
-        case 3:
-            return [color, color, color]
-        default:
-            return [color] // return 1 dot
-        }
-    }
-    
-    func dotMarker(shouldMoveOnHighlightingOnDayView dayView: CVCalendarDayView) -> Bool {
-        return true
-    }
-
-    func dotMarker(sizeOnDayView dayView: DayView) -> CGFloat {
-        return 13
-    }
-
     
     func weekdaySymbolType() -> WeekdaySymbolType {
         return .short
@@ -185,7 +193,7 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     func shouldShowCustomSingleSelection() -> Bool {
         return false
     }
-
+    
     func preliminaryView(viewOnDayView dayView: DayView) -> UIView {
         let circleView = CVAuxiliaryView(dayView: dayView, rect: dayView.frame, shape: CVShape.circle)
         circleView.fillColor = .colorFromCode(0xCCCCCC)
@@ -200,35 +208,35 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     }
     
     func supplementaryView(viewOnDayView dayView: DayView) -> UIView {
+        
+        dayView.setNeedsLayout()
+        dayView.layoutIfNeeded()
+        
         let π = M_PI
         
-        let ringSpacing: CGFloat = 3.0
-        let ringInsetWidth: CGFloat = 1.0
-        let ringVerticalOffset: CGFloat = 1.0
-        var ringLayer: CAShapeLayer!
+        let ringLayer = CAShapeLayer()
         let ringLineWidth: CGFloat = 4.0
-        let ringLineColour: UIColor = .blue
+        let ringLineColour = UIColor.blue
         
-        let newView = UIView(frame: dayView.bounds)
+        let newView = UIView(frame: dayView.frame)
         
-        let diameter: CGFloat = (newView.bounds.width) - ringSpacing
-        let radius: CGFloat = diameter / 2.0
+        let diameter = (min(newView.bounds.width, newView.bounds.height))
+        let radius = diameter / 2.0 - ringLineWidth
         
-        let rect = CGRect(x: newView.frame.midX-radius, y: newView.frame.midY-radius-ringVerticalOffset, width: diameter, height: diameter)
-        
-        ringLayer = CAShapeLayer()
         newView.layer.addSublayer(ringLayer)
         
         ringLayer.fillColor = nil
         ringLayer.lineWidth = ringLineWidth
         ringLayer.strokeColor = ringLineColour.cgColor
         
-        let ringLineWidthInset: CGFloat = CGFloat(ringLineWidth/2.0) + ringInsetWidth
-        let ringRect: CGRect = rect.insetBy(dx: ringLineWidthInset, dy: ringLineWidthInset)
-        let centrePoint: CGPoint = CGPoint(x: ringRect.midX, y: ringRect.midY)
-        let startAngle: CGFloat = CGFloat(-π/2.0)
-        let endAngle: CGFloat = CGFloat(π * 2.0) + startAngle
-        let ringPath: UIBezierPath = UIBezierPath(arcCenter: centrePoint, radius: ringRect.width/2.0, startAngle: startAngle, endAngle: endAngle, clockwise: true)
+        let centrePoint = CGPoint(x: newView.bounds.width/2.0, y: newView.bounds.height/2.0)
+        let startAngle = CGFloat(-π/2.0)
+        let endAngle = CGFloat(π * 2.0) + startAngle
+        let ringPath = UIBezierPath(arcCenter: centrePoint,
+                                    radius: radius,
+                                    startAngle: startAngle,
+                                    endAngle: endAngle,
+                                    clockwise: true)
         
         ringLayer.path = ringPath.cgPath
         ringLayer.frame = newView.layer.bounds
@@ -237,11 +245,34 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     }
     
     func supplementaryView(shouldDisplayOnDayView dayView: DayView) -> Bool {
-        if (Int(arc4random_uniform(3)) == 1) {
-            return true
+        
+        guard let currentCalendar = currentCalendar else {
+            return false
+        }
+        var components = Manager.componentsForDate(Foundation.Date(), calendar: currentCalendar)
+        
+        /* For consistency, always show supplementaryView on the 3rd, 13th and 23rd of the current month/year.  This is to check that these expected calendar days are "circled". There was a bug that was circling the wrong dates. A fix was put in for #408 #411.
+         
+         Other month and years show random days being circled as was done previously in the Demo code.
+         */
+        
+        if dayView.date.year == components.year &&
+            dayView.date.month == components.month {
+            
+            if (dayView.date.day == 3 || dayView.date.day == 13 || dayView.date.day == 23)  {
+                print("Circle should appear on " + dayView.date.commonDescription)
+                return true
+            }
+            return false
+        } else {
+            
+            if (Int(arc4random_uniform(3)) == 1) {
+                return true
+            }
+            
+            return false
         }
         
-        return false
     }
     
     func dayOfWeekTextColor() -> UIColor {
@@ -251,18 +282,46 @@ extension ViewController: CVCalendarViewDelegate, CVCalendarMenuViewDelegate {
     func dayOfWeekBackGroundColor() -> UIColor {
         return UIColor.orange
     }
+    
+    func disableScrollingBeforeDate() -> Date {
+        return Date()
+    }
+    
+    func maxSelectableRange() -> Int {
+        return 14
+    }
+    
+    func earliestSelectableDate() -> Date {
+        return Date()
+    }
+    
+    func latestSelectableDate() -> Date {
+        var dayComponents = DateComponents()
+        dayComponents.day = 70
+        let calendar = Calendar(identifier: .gregorian)
+        if let lastDate = calendar.date(byAdding: dayComponents, to: Date()) {
+            return lastDate
+        } else {
+            return Date()
+        }
+    }
 }
 
 
 // MARK: - CVCalendarViewAppearanceDelegate
 
 extension ViewController: CVCalendarViewAppearanceDelegate {
+    
+    func dayLabelWeekdayDisabledColor() -> UIColor {
+        return UIColor.lightGray
+    }
+    
     func dayLabelPresentWeekdayInitallyBold() -> Bool {
         return false
     }
     
     func spaceBetweenDayViews() -> CGFloat {
-        return 2
+        return 0
     }
     
     func dayLabelFont(by weekDay: Weekday, status: CVStatus, present: CVPresent) -> UIFont { return UIFont.systemFont(ofSize: 14) }
@@ -290,13 +349,8 @@ extension ViewController: CVCalendarViewAppearanceDelegate {
 
 extension ViewController {
     @IBAction func switchChanged(sender: UISwitch) {
-        if sender.isOn {
-            calendarView.changeDaysOutShowingState(false)
-            shouldShowDaysOut = true
-        } else {
-            calendarView.changeDaysOutShowingState(true)
-            shouldShowDaysOut = false
-        }
+        calendarView.changeDaysOutShowingState(shouldShow: sender.isOn)
+        shouldShowDaysOut = sender.isOn
     }
     
     @IBAction func todayMonthView() {
@@ -327,34 +381,39 @@ extension ViewController {
 
 extension ViewController {
     func toggleMonthViewWithMonthOffset(offset: Int) {
-        let calendar = NSCalendar.current
-//        let calendarManager = calendarView.manager
-        var components = Manager.componentsForDate(Foundation.Date()) // from today
+        guard let currentCalendar = currentCalendar else {
+            return
+        }
+        
+        var components = Manager.componentsForDate(Foundation.Date(), calendar: currentCalendar) // from today
         
         components.month! += offset
         
-        let resultDate = calendar.date(from: components)!
+        let resultDate = currentCalendar.date(from: components)!
         
         self.calendarView.toggleViewWithDate(resultDate)
     }
     
-    func didShowNextMonthView(date: NSDate)
-    {
-//        let calendar = NSCalendar.currentCalendar()
-//        let calendarManager = calendarView.manager
-        let components = Manager.componentsForDate(date as Date) // from today
+    
+    func didShowNextMonthView(_ date: Date) {
+        guard let currentCalendar = currentCalendar else {
+            return
+        }
         
-        print("Showing Month: \(components.month)")
+        let components = Manager.componentsForDate(date, calendar: currentCalendar) // from today
+        
+        print("Showing Month: \(components.month!)")
     }
     
     
-    func didShowPreviousMonthView(date: NSDate)
-    {
-//        let calendar = NSCalendar.currentCalendar()
-//        let calendarManager = calendarView.manager
-        let components = Manager.componentsForDate(date as Date) // from today
+    func didShowPreviousMonthView(_ date: Date) {
+        guard let currentCalendar = currentCalendar else {
+            return
+        }
         
-        print("Showing Month: \(components.month)")
+        let components = Manager.componentsForDate(date, calendar: currentCalendar) // from today
+        
+        print("Showing Month: \(components.month!)")
     }
     
 }

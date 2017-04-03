@@ -26,6 +26,8 @@ public final class CVCalendarMonthView: UIView {
         return calendarView.touchController
     }
 
+    var allowScrollToPreviousMonth = true
+    
     // MARK: - Public properties
 
     public weak var calendarView: CVCalendarView!
@@ -76,10 +78,11 @@ extension CVCalendarMonthView {
     public func commonInit() {
         let calendarManager = calendarView.manager
         safeExecuteBlock({
+            let calendar = self.calendarView.delegate?.calendar?() ?? Calendar.current
             self.numberOfWeeks = calendarManager?.monthDateRange(self.date).countOfWeeks
             self.weeksIn = calendarManager?.weeksWithWeekdaysForMonthDate(self.date).weeksIn
             self.weeksOut = calendarManager?.weeksWithWeekdaysForMonthDate(self.date).weeksOut
-            self.currentDay = Manager.dateRange(Foundation.Date()).day
+            self.currentDay = Manager.dateRange(Foundation.Date(), calendar: calendar).day
             }, collapsingOnNil: true, withObjects: date as AnyObject?)
     }
 }
@@ -192,7 +195,7 @@ extension CVCalendarMonthView {
         for object in objects {
             if object == nil {
                 if collapsing {
-                    fatalError("Object { \(object) } must not be nil!")
+                    fatalError("Object { \(String(describing: object)) } must not be nil!")
                 } else {
                     return
                 }

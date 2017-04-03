@@ -134,7 +134,7 @@ extension CVCalendarContentViewController {
 
     public func presentPreviousView(_ view: UIView?) { }
 
-    public func updateDayViews(_ hidden: Bool) { }
+    public func updateDayViews(shouldShow: Bool) { }
 }
 
 // MARK: - Contsant conversion
@@ -157,8 +157,8 @@ extension CVCalendarContentViewController {
 
 extension CVCalendarContentViewController {
     public func dateBeforeDate(_ date: Foundation.Date) -> Foundation.Date {
-        var components = Manager.componentsForDate(date)
-        let calendar = Calendar.current
+        let calendar = self.calendarView.delegate?.calendar?() ?? Calendar.current
+        var components = Manager.componentsForDate(date, calendar: calendar)
 
         components.month! -= 1
 
@@ -168,8 +168,8 @@ extension CVCalendarContentViewController {
     }
 
     public func dateAfterDate(_ date: Foundation.Date) -> Foundation.Date {
-        var components = Manager.componentsForDate(date)
-        let calendar = Calendar.current
+        let calendar = self.calendarView.delegate?.calendar?() ?? Calendar.current
+        var components = Manager.componentsForDate(date, calendar: calendar)
 
         components.month! += 1
 
@@ -230,12 +230,14 @@ extension CVCalendarContentViewController {
                     if animated {
                         UIView.animate(withDuration: 0.2, delay: 0,
                                                    options: UIViewAnimationOptions.curveLinear,
-                                                   animations: {
-                            self.layoutViews(viewsToLayout, toHeight: height)
-                            }) { _ in
-                                self.presentedMonthView.frame.size =
-                                    self.presentedMonthView.potentialSize
-                                self.presentedMonthView.updateInteractiveView()
+                                                   animations: { [weak self] in
+                            self?.layoutViews(viewsToLayout, toHeight: height)
+                        }) { [weak self] _ in
+                            guard let strongSelf = self else {
+                                return
+                            }
+                            strongSelf.presentedMonthView.frame.size = strongSelf.presentedMonthView.potentialSize
+                            strongSelf.presentedMonthView.updateInteractiveView()
                         }
                     } else {
                         layoutViews(viewsToLayout, toHeight: height)

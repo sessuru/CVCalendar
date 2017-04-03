@@ -42,6 +42,8 @@ public final class CVCalendarView: UIView {
     public var (weekViewSize, dayViewSize): (CGSize?, CGSize?)
 
     fileprivate var validated = false
+    fileprivate var currentOrientation: UIDeviceOrientation
+    fileprivate var maxHeight: CGFloat = 0
 
     public var firstWeekday: Weekday {
         if let delegate = delegate {
@@ -61,7 +63,8 @@ public final class CVCalendarView: UIView {
 
     public var presentedDate: CVDate! {
         didSet {
-            if let _ = oldValue {
+            let calendar = self.delegate?.calendar?() ?? Calendar.current
+            if oldValue != nil && presentedDate.convertedDate(calendar: calendar) != oldValue.convertedDate(calendar: calendar) {
                 delegate?.presentedDateUpdated?(presentedDate)
             }
         }
@@ -94,6 +97,52 @@ public final class CVCalendarView: UIView {
             return should
         }
         return true
+    }
+    
+    
+    public var shouldSelectRange: Bool {
+        get {
+            if let delegate = delegate, let should = delegate.shouldSelectRange?() {
+                return should
+            }
+            return false
+        }
+    }
+    
+    public var disableScrollingBeyondDate: Date? {
+        get {
+            if let delegate = delegate, let date = delegate.disableScrollingBeforeDate?() {
+                return date
+            }
+            return nil
+        }
+    }
+    
+    public var maxSelectableRange: Int {
+        get {
+            if let delegate = delegate, let range = delegate.maxSelectableRange?() {
+                return range
+            }
+            return 0
+        }
+    }
+    
+    public var earliestSelectableDate: Date? {
+        get {
+            if let delegate = delegate, let date = delegate.earliestSelectableDate?() {
+                return date
+            }
+            return nil
+        }
+    }
+    
+    public var latestSelectableDate: Date? {
+        get {
+            if let delegate = delegate, let date = delegate.latestSelectableDate?() {
+                return date
+            }
+            return nil
+        }
     }
 
     // MARK: - Calendar View Delegate
@@ -173,17 +222,23 @@ public final class CVCalendarView: UIView {
     // MARK: - Initialization
 
     public init() {
+        currentOrientation = UIDevice.current.orientation
+        
         super.init(frame: CGRect.zero)
         isHidden = true
     }
 
     public override init(frame: CGRect) {
+        currentOrientation = UIDevice.current.orientation
+        
         super.init(frame: frame)
         isHidden = true
     }
 
     // IB Initialization
     public required init?(coder aDecoder: NSCoder) {
+        currentOrientation = UIDevice.current.orientation
+        
         super.init(coder: aDecoder)
         isHidden = true
     }
@@ -193,6 +248,13 @@ public final class CVCalendarView: UIView {
 
 extension CVCalendarView {
     public func commitCalendarViewUpdate() {
+        if currentOrientation != UIDevice.current.orientation {
+            validated = false
+            currentOrientation = UIDevice.current.orientation
+        }
+    
+        setNeedsLayout()
+        layoutIfNeeded()
         if let _ = delegate, let contentController = contentController {
             let contentViewSize = contentController.bounds.size
             let selfSize = bounds.size
@@ -207,13 +269,18 @@ extension CVCalendarView {
 
                 let vSpace = appearance.spaceBetweenWeekViews!
                 let hSpace = appearance.spaceBetweenDayViews!
+                
+                if selfSize.height > maxHeight {
+                    maxHeight = selfSize.height
+                }
 
                 if let mode = calendarMode {
                     switch mode {
                     case .weekView:
-                        height = selfSize.height
+                        height = contentViewSize.height
+                        contentController.updateHeight(height, animated: false)
                     case .monthView :
-                        height = (selfSize.height / countOfWeeks) - (vSpace * countOfWeeks)
+                        height = (maxHeight / countOfWeeks) - (vSpace * countOfWeeks)
                     }
 
                     // If no height constraint found we set it manually.
@@ -246,9 +313,9 @@ extension CVCalendarView {
 
 extension CVCalendarView {
     public func didSelectDayView(_ dayView: CVCalendarDayView) {
+        presentedDate = dayView.date
+        delegate?.didSelectDayView?(dayView, animationDidFinish: false)
         if let controller = contentController {
-            presentedDate = dayView.date
-            delegate?.didSelectDayView?(dayView, animationDidFinish: false)
             controller.performedDayViewSelection(dayView) // TODO: Update to range selection
         }
     }
@@ -257,8 +324,8 @@ extension CVCalendarView {
 // MARK: - Convenience API
 
 extension CVCalendarView {
-    public func changeDaysOutShowingState(_ shouldShow: Bool) {
-        contentController.updateDayViews(shouldShow)
+    public func changeDaysOutShowingState(shouldShow: Bool) {
+        contentController.updateDayViews(shouldShow: shouldShow)
     }
 
     public func toggleViewWithDate(_ date: Foundation.Date) {
@@ -278,7 +345,8 @@ extension CVCalendarView {
     }
 
     public func changeMode(_ mode: CalendarMode, completion: @escaping () -> () = {}) {
-        guard let selectedDate = coordinator.selectedDayView?.date.convertedDate() ,
+        let calendar = self.delegate?.calendar?() ?? Calendar.current
+        guard let selectedDate = coordinator.selectedDayView?.date.convertedDate(calendar: calendar) ,
             calendarMode != mode else {
                 return
         }
@@ -302,14 +370,13 @@ extension CVCalendarView {
         newController.scrollView.alpha = 0
         addSubview(newController.scrollView)
 
-        UIView.animate(withDuration: 0.5, delay: 0,
-                                   options: UIViewAnimationOptions(), animations: {
-            self.contentController.scrollView.alpha = 0
+        UIView.animate(withDuration: 0.5, delay: 0, options: UIViewAnimationOptions(), animations: { [weak self] in
+            self?.contentController.scrollView.alpha = 0
             newController.scrollView.alpha = 1
-        }) { _ in
-            self.contentController.scrollView.removeAllSubviews()
-            self.contentController.scrollView.removeFromSuperview()
-            self.contentController = newController
+        }) { [weak self] _ in
+            self?.contentController.scrollView.removeAllSubviews()
+            self?.contentController.scrollView.removeFromSuperview()
+            self?.contentController = newController
             completion()
         }
     }
